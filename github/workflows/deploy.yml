@@ -23,6 +23,21 @@ jobs:
           python -m pip install --upgrade pip
           pip install -r requirements.txt
 
+      # Paso de depuración para verificar las variables
+      - name: Debug Secrets
+        run: |
+          echo "API_KEY=$API_KEY"
+          echo "HOST=$HOST"
+          echo "USER=$USER"
+          echo "PASSWORD=$PASSWORD"
+          echo "DATABASE=$DATABASE"
+        env:
+          API_KEY: ${{ secrets.API_KEY }}
+          HOST: ${{ secrets.HOST }}
+          USER: ${{ secrets.USER }}
+          PASSWORD: ${{ secrets.PASSWORD }}
+          DATABASE: ${{ secrets.DATABASE }}
+
       - name: Run Streamlit
         env:
           API_KEY: ${{ secrets.API_KEY }}
@@ -32,4 +47,5 @@ jobs:
           DATABASE: ${{ secrets.DATABASE }}
         run: |
           streamlit run app.py
+
 
