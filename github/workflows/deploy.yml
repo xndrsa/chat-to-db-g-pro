@@ -45,6 +45,7 @@ jobs:
           USER: ${{ secrets.USER }}
           PASSWORD: ${{ secrets.PASSWORD }}
           DATABASE: ${{ secrets.DATABASE }}
+          PORT: "5432"
         run: |
           streamlit run app.py
 
