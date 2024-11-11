@@ -26,9 +26,10 @@ jobs:
       - name: Run Streamlit
         env:
           API_KEY: ${{ secrets.API_KEY }}
-          DATABASE_HOST: ${{ secrets.HOST }}
-          DATABASE_USER: ${{ secrets.USER }}
-          DATABASE_PASSWORD: ${{ secrets.PASSWORD }}
-          DATABASE_NAME: ${{ secrets.DATABASE }}
+          HOST: ${{ secrets.HOST }}
+          USER: ${{ secrets.USER }}
+          PASSWORD: ${{ secrets.PASSWORD }}
+          DATABASE: ${{ secrets.DATABASE }}
         run: |
           streamlit run app.py
+
