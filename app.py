@@ -12,15 +12,6 @@ api_key = os.getenv("API_KEY")
 
 
 
-conn =psycopg2.connect(
-    host=os.getenv("HOST"),
-  user=os.getenv("USER"),
-  password=os.getenv("PASSWORD"),
-  database=os.getenv("DATABASE"),
-  port=5432
-)
-
-
 host = os.getenv("HOST")
 user = os.getenv("USER")
 database = os.getenv("DATABASE")
@@ -30,6 +21,19 @@ print("API_KEY:", api_key)
 print("HOST:", host)
 print("USER:", user)
 print("DATABASE:", database)
+
+
+
+conn =psycopg2.connect(
+    host=os.getenv("HOST"),
+  user=os.getenv("USER"),
+  password=os.getenv("PASSWORD"),
+  database=os.getenv("DATABASE"),
+  port=5432
+)
+
+
+
 
 genai.configure(api_key=api_key)
 
