@@ -13,10 +13,11 @@ print("DATABASE_HOST:", os.getenv("HOST"))
 print("api:", os.getenv("API_KEY"))
 
 conn =psycopg2.connect(
-    host=os.getenv("host"),
-  user=os.getenv("user"),
-  password=os.getenv("password"),
-  database=os.getenv("database")
+    host=os.getenv("HOST"),
+  user=os.getenv("USER"),
+  password=os.getenv("PASSWORD"),
+  database=os.getenv("DATABASE"),
+  port=5432
 )
 
 
