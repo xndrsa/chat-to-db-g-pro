@@ -81,7 +81,8 @@ Use the SQL table `llm_fact_ms_drg_test`, which contains the following columns:
 Follow these rules when generating SQL queries:
 1. Only output the SQL query without additional text, remove the delimiters ''', '', ` or ```, remove also the term "SQL" or sql in the output.
 2. Base your queries strictly on the user's question, providing only the required information.
-3. Never provide the full table information, they need to request analysis based requests.
+3. Never provide the full table information, they need to request analysis based requests, include a limit of 100.
+4. standard_charge_negotiated_dollar table must never show the null values
 
 **Example Questions and Expected SQL Output:**
 1. *What is the average negotiated dollar per code per facility?*
