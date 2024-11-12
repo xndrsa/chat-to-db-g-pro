@@ -181,7 +181,7 @@ if submit:
     data_analisys=get_gemini_reply(question,data_plus_prompt_analysis)
 
     #st.subheader("The response is:")
-    st.header(data_analisys)
+    #st.header(data_analisys)
     st.dataframe(data)
   except:
     unrelated_topic = get_gemini_reply(question,prompt=prompt_if_different_topic)
