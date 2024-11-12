@@ -29,12 +29,12 @@ def get_gemini_reply(question, prompt):
     model = genai.GenerativeModel('gemini-pro')
 
     token_count_in = model.count_tokens(f"{prompt}\n\n{question}")
-    print(f"Input token count: {token_count_in}")
+    # print(f"Input token count: {token_count_in}")
 
     response = model.generate_content(f"{prompt}\n\n{question}")
 
     token_count_out = model.count_tokens(response.text)
-    print(f"Output token count: {token_count_out}")
+    # print(f"Output token count: {token_count_out}")
     
     return response.text
 
@@ -160,10 +160,11 @@ with st.form(key='question_form'):
     col1, col2 = st.columns([4, 1])
     
     with col1:
-        question = st.text_input(
+        question = st.text_area(
            "Type your question here:",
             placeholder="",  
-            key="question_input"
+            key="question_input",
+            height=100
         )
         
     with col2:
@@ -172,8 +173,8 @@ with st.form(key='question_form'):
 
 if submit:
   sql_query =get_gemini_reply(question,prompt)
-  print(f"\n{question}")
-  print(f"\n{sql_query}")
+  # print(f"\n{question}")
+  # print(f"\n{sql_query}")
   try:
     data=read_sql_query(sql_query)
     data_plus_prompt_analysis=f"{prompt_analysis}\n{data}"
