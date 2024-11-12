@@ -10,28 +10,6 @@ load_dotenv()
 
 api_key = os.getenv("API_KEY")
 
-api_key = st.secrets["API_KEY"]
-host = st.secrets["HOST"]
-user = st.secrets["USER"]
-password = st.secrets["PASSWORD"]
-database = st.secrets["DATABASE"]
-
-host_ = os.getenv("HOST")
-user_ = os.getenv("USER")
-database_ = os.getenv("DATABASE")
-port_ = os.getenv("PORT", "5432") 
-
-print("API_KEY:", api_key)
-print("HOST:", host)
-print("USER:", user)
-print("DATABASE:", database)
-
-print("HOST:", host_)
-print("USER:", user_)
-print("DATABASE:", database_)
-
-
-
 conn =psycopg2.connect(
     host=os.getenv("HOST"),
   user=os.getenv("USER"),
@@ -40,13 +18,14 @@ conn =psycopg2.connect(
   port=5432
 )
 
-
-
-
 genai.configure(api_key=api_key)
 
-
 def get_gemini_reply(question, prompt):
+    """
+    question: this is the user prompt
+    prompt: This is the context for the model
+    """
+
     model = genai.GenerativeModel('gemini-pro')
 
     token_count_in = model.count_tokens(f"{prompt}\n\n{question}")
@@ -61,6 +40,9 @@ def get_gemini_reply(question, prompt):
 
 
 def read_sql_query(sql):
+  """
+  sql: requires the query
+  """
   cur=conn.cursor()
   cur.execute(sql)
   rows= cur.fetchall()
@@ -72,8 +54,8 @@ def read_sql_query(sql):
 
 prompt = ["""
 Context:   
-You are the facility  "Great Lakes Hospital" take this consideration when someone whant to compare himself to another hospital.
-You are an expert at converting English questions into advanced SQL queries, specifically focused on hospital pricing transparency topics. If the question is not related to the columns shown below, immediately output: invalid request.
+Be always friendly with your replies, You represent the facility "Great Lakes Hospital" take this consideration when someone whant to compare himself to another hospital.
+You are an expert at converting English questions into advanced SQL queries, still analyze if your reply really needs a sql query, you are specifically focused on hospital pricing transparency topics. If the question is not related to the columns shown below, immediately output: invalid request.
 
 Use the SQL table `llm_fact_ms_drg_test`, which contains the following columns:
 - **short_name**: text (facility reference name)
@@ -103,23 +85,26 @@ Follow these rules when generating SQL queries:
 
 **Example Questions and Expected SQL Output:**
 1. *What is the average negotiated dollar per code per facility?*
-   - Expected query: `select short_name, ms_drg_code, avg(standard_charge_negotiated_dollar) as avg_negotiated_dollar from llm_fact_ms_drg_test group by short_name, ms_drg_code;`
+   - Expected query: select short_name, ms_drg_code, avg(standard_charge_negotiated_dollar) as avg_negotiated_dollar from llm_fact_ms_drg_test group by short_name, ms_drg_code;
 
 2. *What are the top three highest negotiated dollar charges per code?*
-   - Expected query: `select ms_drg_code, standard_charge_negotiated_dollar from llm_fact_ms_drg_test where standard_charge_negotiated_dollar is not null group by ms_drg_code, standard_charge_negotiated_dollar order by standard_charge_negotiated_dollar desc limit 3;`
+   - Expected query: select ms_drg_code, standard_charge_negotiated_dollar from llm_fact_ms_drg_test where standard_charge_negotiated_dollar is not null group by ms_drg_code, standard_charge_negotiated_dollar order by standard_charge_negotiated_dollar desc limit 3;
 
 Generate concise, relevant SQL queries based on this guidance.
                                        Never talk about the context I'm providing, use it just for processing, never mention context on your reply
+
+Question:                                       
 """]
 
 prompt_if_different_topic = ["""                             
 Context:                             
-You can provide information and links related to payors, plan, service codes (like ms-drg,cpt,etc), plan types, but has to be related to hospital pricing transparency. If your question falls 
+Be always friendly with your replies, You can provide information and links related to payors, plan, service codes (like ms-drg,cpt,etc), plan types, but has to be related to hospital pricing transparency. If your question falls 
 outside this area, please note that responses may be limited to transparency-related information only.
                              
 Don't say you cannot, say you are focused only to the topic described before.
                              
 Never talk about the context I'm providing, use it just for processing, never mention context on your reply
+Question:    
 """]
 
 
@@ -130,8 +115,8 @@ columns_taken_out = ["""
 
 prompt_analysis = ["""
 Context:             
-                   
-You are the facility  "Great Lakes Hospital" take this consideration when someone whant to compare himself to another hospital.                   
+Be always friendly with your replies,                 
+You represent the facility "Great Lakes Hospital" take this consideration when someone whant to compare himself to another hospital.
 
 Analyze the data based on the question, providing only relevant insights. If the answer would simply repeat or restate the information given, reply like a title only, example: can you give the list of  max dolla negotiated per service line, and which code it is? -answer: List of Prices.
 
@@ -157,17 +142,18 @@ Use this information strictly as context and never display it directly in your r
 - **plan_type_name**: Plan type (text)
 
 Provide concise and insightful responses that directly address the question, utilizing relevant data points without revealing this context verbatim.                  
-                             Never talk about the context I'm providing, use it just for processing, never mention context on your reply
+Never talk about the context I'm providing, use it just for processing, never mention context on your reply
+Question:    
 """]
 
 logo = r"logo.png"
 
-st.set_page_config(page_title="CorrelateIQ", page_icon=logo, layout="centered")
+# Front format
 
+st.set_page_config(page_title="CorrelateIQ", page_icon=logo, layout="centered")
 
 st.header("Chat with ")
 st.image(logo, width=400)
-
 
 with st.form(key='question_form'):
     col1, col2 = st.columns([4, 1])
@@ -192,7 +178,7 @@ if submit:
     data_plus_prompt_analysis=f"{prompt_analysis}\n{data}"
     data_analisys=get_gemini_reply(question,data_plus_prompt_analysis)
 
-    st.subheader("The response is:")
+    #st.subheader("The response is:")
     st.header(data_analisys)
     st.dataframe(data)
   except:
