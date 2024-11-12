@@ -147,7 +147,7 @@ Never talk about the context I'm providing, use it just for processing, never me
 Question:    
 """]
 
-logo = r"logo.png"
+logo = r"Correlate-Logo-Final.png"
 
 # Front format
 
