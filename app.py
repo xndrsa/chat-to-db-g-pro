@@ -10,17 +10,25 @@ load_dotenv()
 
 api_key = os.getenv("API_KEY")
 
+api_key = st.secrets["API_KEY"]
+host = st.secrets["HOST"]
+user = st.secrets["USER"]
+password = st.secrets["PASSWORD"]
+database = st.secrets["DATABASE"]
 
-
-host = os.getenv("HOST")
-user = os.getenv("USER")
-database = os.getenv("DATABASE")
-port = os.getenv("PORT", "5432") 
+host_ = os.getenv("HOST")
+user_ = os.getenv("USER")
+database_ = os.getenv("DATABASE")
+port_ = os.getenv("PORT", "5432") 
 
 print("API_KEY:", api_key)
 print("HOST:", host)
 print("USER:", user)
 print("DATABASE:", database)
+
+print("HOST:", host_)
+print("USER:", user_)
+print("DATABASE:", database_)
 
 
 
