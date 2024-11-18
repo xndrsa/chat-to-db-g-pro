@@ -468,7 +468,7 @@ if submit:
 
 st.sidebar.title("Usage Stats")
 st.sidebar.markdown(f"**Total Tokens Used:** {total_tokens}")
-st.sidebar.markdown(f"**Total LLM Calls:** {total_llm_calls}")
+#st.sidebar.markdown(f"**Total LLM Calls:** {total_llm_calls}")
 
 if sql_query and sql_query != "Invalid query":
     st.sidebar.markdown(f"**Query Generated:** {sql_query}")
