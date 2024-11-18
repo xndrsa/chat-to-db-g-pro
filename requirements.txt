@@ -3,3 +3,6 @@ pandas
 psycopg2-binary
 python-dotenv
 google-generativeai
+langchain
+langchain_core
+langchain_community

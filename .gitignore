@@ -2,6 +2,15 @@
 .llm/
 llm
 
+client_secret.json
+*.docx
+
 venv/
 __pycache__/
 *.pyc
+
+*.faiss
+*.pkl
+
+*.json
+*.csv
