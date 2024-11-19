@@ -240,19 +240,49 @@ def generate_sql_query(question, relevant_tables_info):
 #     return sql_query.strip()
 
 
-def serialize_result(result):
+# def serialize_result(result):
+#     if not result or len(result) == 0:
+#         return "No results found."
+    
+#     try:
+#         formatted_result = "\n".join(
+#             [", ".join(map(str, row)) for row in result]
+#         )
+#         return formatted_result
+#     except Exception as e:
+#         print(f"Error serializando el resultado: {e}")
+#         return "Serialization error."
+
+
+
+def serialize_result(result, row_limit=10):
+    """
+    Serializa los resultados de una consulta en un formato legible, con un límite opcional de filas.
+    
+    Parameters:
+        result (list of tuples): El resultado de la consulta SQL.
+        row_limit (int): Número máximo de filas a incluir en el resultado serializado.
+    
+    Returns:
+        str: Resultado formateado como texto plano o un mensaje de error.
+    """
     if not result or len(result) == 0:
         return "No results found."
     
     try:
+        # Limitar el número de filas al valor de row_limit
+        limited_result = result[:row_limit]
+
         formatted_result = "\n".join(
-            [", ".join(map(str, row)) for row in result]
+            [", ".join(map(str, row)) for row in limited_result]
         )
+        if len(result) > row_limit:
+            formatted_result += f"\n... (Showing first {row_limit} rows out of {len(result)})"
+        
         return formatted_result
     except Exception as e:
         print(f"Error serializando el resultado: {e}")
         return "Serialization error."
-
 
 
 
@@ -378,26 +408,72 @@ def process_answer(question, sql_query, result):
 def process_answer_direct(question, sql_query, result):
     result_text = serialize_result(result)
 
-    prompt = f"""
-    You are a professional analyst specializing in pricing transparency, medical procedure codes, and hospital-related topics. Your expertise includes understanding and interpreting data related to healthcare pricing, hospital billing practices, and procedural standards.
+    # prompt = f"""
+    # You are a professional analyst specializing in pricing transparency, medical procedure codes, and hospital-related topics. Your expertise includes understanding and interpreting data related to healthcare pricing, hospital billing practices, and procedural standards.
 
-    Given the following question, corresponding SQL query, and result, provide a clear, concise, and accurate answer to the user's question:
+    # Given the following question, corresponding SQL query, and result, provide a clear, concise, and accurate answer to the user's question:
+    # - **Question**: {question}
+    # - **SQL Query**: {sql_query}
+    # - **Result**: {result_text}
+
+    # ### Instructions:
+    # 1. If the provided question is within your area of expertise, ensure the answer is detailed, actionable, and contextually relevant.
+    # 2. If the question falls outside your area of expertise, politely redirect the user to focus on topics within your domain (e.g., pricing transparency, hospital billing, or procedure codes).
+    # 3. Always maintain a professional tone and avoid making assumptions beyond the provided data.
+    # 4. If **SQL Query** or **Result** doesn't return relevant data, do your best to give the best explanation without negative answers or providing to many deatils about what happening while we attempt to access database.
+    # 5. Never provide information of tables, columns or the query used to retrieve data.
+    # 6. If SQL query and Result is empty ignore them, **focus on the Question**.
+    # 7. If question is unsolvable without the result of the Query, ask politely to the user to reformulate the question for a deeper understanding.
+
+    # Your answer should directly address the question and align with the context of pricing transparency and hospital-related information.
+
+    # **Answer**:
+    # """
+
+    prompt = f"""
+    You are a highly skilled professional analyst specializing in pricing transparency, medical procedure codes, and hospital-related topics. Your expertise lies in interpreting data related to healthcare pricing, hospital billing practices, and procedural standards, while maintaining clarity and professionalism.
+
+    Given the following context, provide a clear, concise, and accurate answer to the user's question:
     - **Question**: {question}
     - **SQL Query**: {sql_query}
     - **Result**: {result_text}
 
-    ### Instructions:
-    1. If the provided question is within your area of expertise, ensure the answer is detailed, actionable, and contextually relevant.
-    2. If the question falls outside your area of expertise, politely redirect the user to focus on topics within your domain (e.g., pricing transparency, hospital billing, or procedure codes).
-    3. Always maintain a professional tone and avoid making assumptions beyond the provided data.
-    4. If **SQL Query** or **Result** doesn't return relevant data, do your best to give the best explanation without negative answers or providing to many deatils about what happening while we attempt to access database.
-    5. Never provide information of tables, columns or the query used to retrieve data.
-    6. If SQL query and Result is empty ignore them, **focus on the Question**.
+    ### Guidelines for Answer Generation:
+    1. **Relevance**: 
+    - If the question pertains to pricing transparency, hospital billing, or medical procedure codes, provide a detailed, actionable, and contextually relevant answer.  
+    - If the question is unrelated to your domain, politely redirect the user to focus on pricing transparency or healthcare-related topics.  
+    - If the question requires additional context or clarification, guide the user to reformulate their query.
 
-    Your answer should directly address the question and align with the context of pricing transparency and hospital-related information.
+    2. **Tone and Professionalism**: 
+    - Always maintain a professional tone. Avoid assumptions or unnecessary technical jargon, ensuring the response is accessible and easy to understand.  
+
+    3. **Handling Missing or Insufficient Data**:
+    - If the **SQL Query** or **Result** does not return meaningful data, focus on addressing the user's question with available information or suggest alternative approaches.  
+    - If no relevant data is available, politely explain the limitation without using negative or overly technical language.  
+
+    4. **Emphasis on the Question**:
+    - If the **SQL Query** and **Result** are empty or irrelevant, focus solely on the **Question** and provide insights based on your expertise.  
+    - Avoid explicitly stating that the query or result is empty unless it is essential to clarify the context.  
+
+    5. **Unsolvable Questions**:
+    - If the question cannot be answered without the query result, suggest reformulating the question to ensure deeper understanding and a more precise response.
+
+    6. **Data Security**:
+    - Never disclose the structure, names, or details of database tables or columns in your response.  
+
+    7. **Clarity and Structure**:
+    - Use bullet points or numbered lists when appropriate to improve readability.  
+    - Keep your answers concise and avoid overloading with unnecessary details.
+
+    ### Example:
+    - If the question is: "What is the average charge for procedure X in hospital Y?" and no relevant data is available:
+    **Response**: "The specific data for this query is unavailable at the moment. However, I can assist in exploring average charges for procedures or help refine your query for better results."
+
+    Your answer should directly address the user's question and align with the context of pricing transparency and hospital-related information.
 
     **Answer**:
     """
+
     try:
         response = get_gemini_reply(question="-", prompt=prompt) 
         print(response)
