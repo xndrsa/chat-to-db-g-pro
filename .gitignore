@@ -14,3 +14,11 @@ __pycache__/
 
 *.json
 *.csv
+
+consuming_api_docker.py
+consuming_api_test.py
+st_lc_v2.py
+streamlit_lc.py
+tst_langchain_with_rag.py
+
+
