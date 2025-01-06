@@ -399,7 +399,7 @@ if submit:
     st.subheader("Answer:")
     st.write(final_answer)    
 
-    if isinstance(df, pd.DataFrame) and not df.empty:
+    if df is not None and not df.empty:
         st.subheader("Query Results:")
         st.dataframe(df)
 
