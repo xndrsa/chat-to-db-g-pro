@@ -1,6 +1,7 @@
 .env
 .llm/
 llm
+.botsql
 
 client_secret.json
 *.docx

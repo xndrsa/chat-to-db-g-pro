@@ -73,7 +73,7 @@ def get_gemini_reply(question, prompt):
 
     global total_tokens, total_llm_calls
 
-    model = genai.GenerativeModel('gemini-1.5-flash')#models/gemini-1.5-pro-latest')
+    model = genai.GenerativeModel('gemini-2.0-flash-exp')  #'gemini-1.5-flash')#models/gemini-1.5-pro-latest')
     
     token_count_prompt = model.count_tokens(prompt).total_tokens
     token_count_question = model.count_tokens(question).total_tokens
@@ -399,7 +399,7 @@ if submit:
     st.subheader("Answer:")
     st.write(final_answer)    
 
-    if isinstance(df, pd.DataFrame) and not df.empty:
+    if df is not None and not df.empty:
         st.subheader("Query Results:")
         st.dataframe(df)
 
@@ -428,8 +428,3 @@ else:
 
 # print("\nResumen Final:")
 # print(f"Total de Tokens: {total_tokens}")
-
-
-
-
-
