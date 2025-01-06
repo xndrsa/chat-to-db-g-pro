@@ -73,7 +73,7 @@ def get_gemini_reply(question, prompt):
 
     global total_tokens, total_llm_calls
 
-    model = genai.GenerativeModel('gemini-1.5-flash')#models/gemini-1.5-pro-latest')
+    model = genai.GenerativeModel('gemini-2.0-flash-exp')  #'gemini-1.5-flash')#models/gemini-1.5-pro-latest')
     
     token_count_prompt = model.count_tokens(prompt).total_tokens
     token_count_question = model.count_tokens(question).total_tokens
