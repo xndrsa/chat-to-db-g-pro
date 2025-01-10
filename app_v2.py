@@ -38,7 +38,6 @@ def get_table_names(db, allowed_tables=None):
         all_tables_info = db.get_table_info(table_names)
         
         for table in table_names:
-            #print(f"Procesando información de la tabla: {table}")
             table_info = db.get_table_info([table])
             
             columns = [
@@ -96,6 +95,7 @@ def get_gemini_reply_sql(question, prompt):
     return response.text
 
 def get_relevant_tables(question, table_names):
+    # This function output is hardcoded right now, but once we add more tables, will need to remove the '#TODO Hardcoded output'
     prompt = f"""
     Return the names of ALL the SQL tables that MIGHT be relevant to the user question. 
     The tables are:
@@ -107,10 +107,8 @@ def get_relevant_tables(question, table_names):
     Important: Only return the name of the table, otherwise return None
     User question: {question}
     """
-    #response = get_gemini_reply(question, prompt) # TODO uncommnet when needed
-    #return response.split("\n")  # Devuelve una lista de tablas relevantes#TODO uncomment when needed
     
-    response=['llm_fact_ms_drg_test', '']#TODO 
+    response=['llm_fact_ms_drg_test', '']#TODO Hardcoded output
     response = [item for item in response if item.strip()]
     return response
 
@@ -189,46 +187,31 @@ def serialize_result(result, row_limit=10):
 
 
 def process_question(question):
-    #print("\n[1] tablas relevantes...")
     relevant_tables = get_relevant_tables(question, list(table_names.keys()))
-    #print(relevant_tables)
     relevant_tables_info = {table: table_names[table] for table in relevant_tables if table in table_names}
         
-    #print("\n[2] Generando consulta SQL...")
     sql_query = generate_sql_query(question, relevant_tables_info)
 
     sql_query_validate = validate_single_query(sql_query)
 
     if "Error" in sql_query_validate:
-        #print("Invalid SQL")
-        #print(sql_query)
-
-        #print("\n[3] Unable to execute query...")
         return None, "Invalid query","No results"
     
     sql_query = sql_query_validate
-    #print("Consulta SQL válida:", sql_query)
-
-    #print("\n[3] Ejecutando consulta en la base de datos...")
     try:
         with conn.cursor() as cursor:
             cursor.execute(sql_query)
             col_names = [desc[0] for desc in cursor.description]
             result = cursor.fetchall()
             if not result:
-                #print("Consulta ejecutada pero no devolvió resultados.")
                 return pd.DataFrame(), sql_query ,"No results"
             df = pd.DataFrame(result, columns=col_names)
-            #print("Resultados de la consulta:", df)
         return df, sql_query, result
     except Exception as e:
-        #print(f"Error al ejecutar la consulta: {e}")
-
         return None, "Invalid query","No results"
 
 answer_template = """ Given the following question, corresponding Query and SQL result, answer the user question: Question: {question} Query: {sql_query} Result: {result} Answer:"""
 answer_prompt = PromptTemplate.from_template(answer_template)
-
 
 output_parser = StrOutputParser()
 
@@ -253,10 +236,6 @@ def process_answer(question, sql_query, result):
         "sql_query": sql_query,
         "result": result_text
     }
-
-    # print("\nPrompt generado para el modelo (diccionario):")
-    # for key, value in generated_prompt.items():
-    #     print(f"{key}: {value} (tipo: {type(value)})")
 
     chain = build_chain(question, sql_query, result_text)
 
